@@ -13,10 +13,6 @@ fi
 # Directory where the script resides
 BASE_DIR=$(dirname "$0")
 
-# Generate a random secret key
-SECRET=$(tr -dc 'a-z0-9-_' < /dev/urandom | head -c50)
-
-
 echo "Initializing the database..."
 psql -U $DBUSER -d $DBNAME -h localhost -f "$BASE_DIR/db/create.sql"
 

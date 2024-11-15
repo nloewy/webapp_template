@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "speed_dating"
+name = "webapp_template"
 version = "1.2023.0"
 authors = ["CompSci 316 Teaching Staff <compsci-316@duke.edu>", "Noah Loewy"]
 description = "Dating App Project"

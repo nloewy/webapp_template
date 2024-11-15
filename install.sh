@@ -20,29 +20,22 @@ if [ -z "$DB_USER" ] || [ -z "$DB_PASSWORD" ] || [ -z "$DB_HOST" ] || [ -z "$DB_
 fi
 
 # Generate secret key if not provided
-if [ -z "$SECRET_KEY" ]; then
-    SECRET=`tr -dc 'a-z0-9-_' < /dev/urandom | head -c50`
-    export SECRET_KEY="$SECRET"
+if ! grep -q "^SECRET_KEY=" .flaskenv; then
+    echo "SECRET_KEY not found in .flaskenv. Generating a new one..."
+    SECRET=$(LC_CTYPE=C tr -dc 'a-z0-9' < /dev/urandom | head -c50)
+    echo "" >> .flaskenv  # Ensure there is a newline
+    echo "SECRET_KEY=\"$SECRET\"" >> .flaskenv
+    echo "SECRET_KEY=$SECRET written to .flaskenv"
+else
+    echo "SECRET_KEY already exists in .flaskenv."
 fi
+
 
 # Export other environment variables
 export FLASK_APP="main.py"
 export FLASK_DEBUG="True"
 export FLASK_RUN_HOST="0.0.0.0"
 export FLASK_RUN_PORT="8080"
-
-# Echo values for verification
-echo "Using the following configuration:"
-echo "FLASK_APP: $FLASK_APP"
-echo "FLASK_DEBUG: $FLASK_DEBUG"
-echo "FLASK_RUN_HOST: $FLASK_RUN_HOST"
-echo "FLASK_RUN_PORT: $FLASK_RUN_PORT"
-echo "SECRET_KEY: $SECRET_KEY"
-echo "DB_NAME: $DB_NAME"
-echo "DB_USER: $DB_USER"
-echo "DB_PASSWORD: $DB_PASSWORD"
-echo "DB_HOST: $DB_HOST"
-echo "DB_PORT: $DB_PORT"
 
 # Check if Homebrew is installed
 if ! command -v brew &> /dev/null; then
@@ -61,9 +54,9 @@ fi
 
 # Create PostgreSQL user and database
 echo "Creating PostgreSQL user and database..."
-psql -U noah -d postgres -c "CREATE USER $DB_USER WITH PASSWORD '$DB_PASSWORD';"
-psql -U noah -d postgres -c "ALTER USER $DB_USER WITH SUPERUSER;"
-psql -U noah -d postgres -c "SELECT 1 FROM pg_catalog.pg_database WHERE datname = '$DB_NAME'" | grep -q 1 || psql -U noah -d postgres -c "CREATE DATABASE $DB_NAME OWNER $DB_USER;"
+psql -U $DB_USER -d postgres -c "CREATE USER $DB_USER WITH PASSWORD '$DB_PASSWORD';"
+psql -U $DB_USER -d postgres -c "ALTER USER $DB_USER WITH SUPERUSER;"
+psql -U $DB_USER -d postgres -c "SELECT 1 FROM pg_catalog.pg_database WHERE datname = '$DB_NAME'" | grep -q 1 || psql -U noah -d postgres -c "CREATE DATABASE $DB_NAME OWNER $DB_USER;"
 
 # Reset pg_hba.conf to require password authentication if needed
 if [ -f "$POSTGRES_CONF" ]; then

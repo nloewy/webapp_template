@@ -67,3 +67,13 @@ class User(UserMixin):
             """,
                               id=id)
         return User(*(rows[0])) if rows else None
+
+    @staticmethod
+    @login.user_loader
+    def get_all():
+        rows = app.db.execute("""
+            SELECT id, email, firstname, lastname
+            FROM Users
+            """,
+                              id=id)
+        return User(*(rows[0])) if rows else None
