@@ -4,6 +4,26 @@
 mybase=`dirname "$mypath"`
 cd $mybase
 
+
+# Ensure we're in the correct directory
+mybase=$(dirname "$0")
+cd $mybase || exit 1
+
+# Check if a virtual environment exists
+if [[ ! -d "venv" ]]; then
+    echo "Virtual environment not found. Creating a new one..."
+    python3 -m venv venv
+    echo "Virtual environment created. Please activate it and rerun the script."
+    exit 1
+fi
+
+if [[ -z "$VIRTUAL_ENV" ]]; then
+    echo "Virtual environment not activated. Please activate it with:"
+    echo "source venv/bin/activate"
+    exit 1
+fi
+
+
 # Load environment variables from .flaskenv file if it exists
 if [ -f ".flaskenv" ]; then
     echo "Loading environment variables from .flaskenv file..."
