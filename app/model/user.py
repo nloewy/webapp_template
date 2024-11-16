@@ -15,19 +15,18 @@ class User(UserMixin):
     @staticmethod
     def get_by_auth(email, password):
         rows = app.db.execute("""
-            SELECT *
+            SELECT password, id, email, firstname, lastname
             FROM Users
             WHERE email = :email
             """,
                               email=email)
-        print(email)
         if not rows:  # email not found
             return None
         elif not check_password_hash(rows[0][0], password):
             # incorrect password
             return None
         else:
-            return User(*(rows[0][:]))
+            return User(*(rows[0][1:]))
 
     @staticmethod
     def email_exists(email):
@@ -70,7 +69,6 @@ class User(UserMixin):
         return User(*(rows[0])) if rows else None
 
     @staticmethod
-    @login.user_loader
     def get_all():
         rows = app.db.execute("""
             SELECT id, email, firstname, lastname

@@ -14,8 +14,8 @@ fi
 BASE_DIR=$(dirname "$0")
 
 echo "Initializing the database..."
-psql -U $DBUSER -h localhost -d postgres -c "DROP DATABASE IF EXISTS $DBNAME;"
-psql -U $DBUSER -h localhost -d postgres -c "CREATE DATABASE $DBNAME;"
-psql -U $DBUSER -h localhost -d $DBNAME -f "$BASE_DIR/db/create.sql"
+psql  -U "$DB_USER" -d postgres -c "DROP DATABASE IF EXISTS $DB_NAME;"
+psql -U "$DB_USER" -d postgres -c "CREATE DATABASE $DB_NAME;"
+psql  -U "$DB_USER" -d "$DB_NAME" -f "$BASE_DIR/db/create.sql"
 
 echo "Setup complete!"
